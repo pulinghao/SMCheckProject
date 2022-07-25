@@ -19,7 +19,11 @@ class DragView: NSView {
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        self.register(forDraggedTypes: [NSFilenamesPboardType, NSURLPboardType, NSPasteboardTypeTIFF])
+        if #available(macOS 10.13, *) {
+            self.registerForDraggedTypes([NSPasteboard.PasteboardType.fileURL,NSPasteboard.PasteboardType.URL,NSPasteboard.PasteboardType.tiff])
+        } else {
+            // Fallback on earlier versions
+        };
     }
     
     override func draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation {
@@ -42,10 +46,14 @@ class DragView: NSView {
     override func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
 //        var files = [URL]()
         var filePath = ""
-        if let board = sender.draggingPasteboard().propertyList(forType: NSFilenamesPboardType) as? NSArray {
-            for path in board {
-                filePath = path as! String
+        if #available(macOS 10.13, *) {
+            if let board = sender.draggingPasteboard.propertyList(forType:NSPasteboard.PasteboardType.fileURL) as? NSArray {
+                for path in board {
+                    filePath = path as! String
+                }
             }
+        } else {
+            // Fallback on earlier versions
         }
         if let delegate = self.delegate {
             delegate.dragFileOk(filePath: filePath)

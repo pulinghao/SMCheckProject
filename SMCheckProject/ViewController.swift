@@ -25,7 +25,7 @@ class ViewController: NSViewController,NSTableViewDataSource,NSTableViewDelegate
     var unusedMethods = [Method]() //无用方法
     var selectedPath : String = "" {
         didSet {
-            if selectedPath.characters.count > 0 {
+            if selectedPath.count > 0 {
                 let ud = UserDefaults()
                 ud.set(selectedPath, forKey: "selectedPath")
                 ud.synchronize()
@@ -57,7 +57,7 @@ class ViewController: NSViewController,NSTableViewDataSource,NSTableViewDelegate
     
     //查找按钮
     @IBAction func searchMethodAction(_ sender: Any) {
-        if selectedPath.characters.count > 0 {
+        if selectedPath.count > 0 {
             self.searchingUnusedMethods()
         }
         
@@ -143,7 +143,7 @@ class ViewController: NSViewController,NSTableViewDataSource,NSTableViewDelegate
         let openPanel = NSOpenPanel();
         openPanel.canChooseDirectories = true;
         openPanel.canChooseFiles = false;
-        if(openPanel.runModal() == NSModalResponseOK) {
+        if(openPanel.runModal() == NSApplication.ModalResponse.OK) {
             //print(openPanel.url?.absoluteString)
             let path = openPanel.url?.absoluteString
             //print("选择文件夹路径: \(path)")
@@ -155,17 +155,17 @@ class ViewController: NSViewController,NSTableViewDataSource,NSTableViewDelegate
     
     //TableView
     //Cell DoubleClick
-    func cellDoubleClick() {
+    @objc func cellDoubleClick() {
         let aMethod = self.unusedMethods[self.resultTb.clickedRow]
         let filePathString = aMethod.filePath.replacingOccurrences(of: "file://", with: "")
         //双击打开finder到指定的文件
-        NSWorkspace.shared().openFile(filePathString, withApplication: "Xcode")
+        NSWorkspace.shared.openFile(filePathString, withApplication: "Xcode")
     }
     //Cell OneClick
     func cellOneClick() {
         let aMethod = self.unusedMethods[self.resultTb.selectedRow]
         let cFile = self.filesDic[aMethod.filePath]
-        self.detailTxv.string = cFile?.content
+        self.detailTxv.string = cFile?.content ?? ""
     }
     
     //NSTableViewDataSource
@@ -177,7 +177,7 @@ class ViewController: NSViewController,NSTableViewDataSource,NSTableViewDelegate
     func tableView(_ tableView: NSTableView, objectValueFor tableColumn: NSTableColumn?, row: Int) -> Any? {
         let aMethod = self.unusedMethods[row]
         
-        let columnId = tableColumn?.identifier
+        let columnId = tableColumn?.identifier.rawValue
         if columnId == "MethodId" {
             return aMethod.pnameId
         } else if columnId == "MethodPath" {

@@ -25,7 +25,7 @@ class ParsingMethod: NSObject {
                 
                 if mtd.params.count > 1 {
                     //处理这种- (void)initWithC:(type)m m2:(type2)i, ... NS_REQUIRES_NIL_TERMINATION;入参为多参数情况
-                    if methodParam.type.characters.count > 0 {
+                    if methodParam.type.count > 0 {
                         shouldAdd = true
                     }
                 } else {
