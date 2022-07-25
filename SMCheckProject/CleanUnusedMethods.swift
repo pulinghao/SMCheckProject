@@ -37,23 +37,24 @@ class CleanUnusedMethods: NSObject {
             var i = 0
             let count = filterPath.count
             for filePathString in filterPath {
-                
-                var fullPath = fileFolderPath
-                
+                var fullPath = fileFolderStringPath
                 fullPath.append(filePathString)
                 
                 //读取文件内容
-                let fileUrl = URL(string: fullPath)
-                
-                if fileUrl == nil {
-                    
+//                let fileUrl = URL(string: fullPath)
+                let fileUrl = URL(fileURLWithPath: fullPath)
+                let urlIsValid = (try? fileUrl.checkResourceIsReachable()) ?? false
+                if !urlIsValid {
+                    print("文件路径不正确")
                 } else {
                     let aFile = File()
                     aFile.path = fullPath
                     //显示parsing的状态
                     observer.on(.next("进度：\(i+1)/\(count) 正在查询文件：\(aFile.name)"))
                     i += 1
-                    let content = try! String(contentsOf: fileUrl!, encoding: String.Encoding.utf8)
+//                    String(contentsOfFile: )
+//                    let content = try! String(contentsOf: fileUrl!, encoding: String.Encoding.utf8)
+                    let content = try! String(contentsOfFile: fullPath, encoding: String.Encoding.utf8)
                     //print("文件内容: \(content)")
                     aFile.content = content
                     

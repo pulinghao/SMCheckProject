@@ -14,13 +14,14 @@ class ViewController: NSViewController,NSTableViewDataSource,NSTableViewDelegate
     
     @IBOutlet weak var parsingIndicator: NSProgressIndicator!
     @IBOutlet weak var desLb: NSTextField!
-    @IBOutlet weak var pathDes: NSTextField!
     @IBOutlet weak var cleanBt: NSButton!
     @IBOutlet weak var resultTb: NSTableView!
     @IBOutlet weak var dragView: DragView!
     @IBOutlet weak var seachBt: NSButtonCell!
     @IBOutlet weak var detailTv: NSScrollView!
     @IBOutlet var detailTxv: NSTextView!
+    @IBOutlet weak var PathTextField: NSTextField!
+    @IBOutlet weak var BrowseBtn: NSButton!
     
     var unusedMethods = [Method]() //无用方法
     var selectedPath : String = "" {
@@ -29,10 +30,11 @@ class ViewController: NSViewController,NSTableViewDataSource,NSTableViewDelegate
                 let ud = UserDefaults()
                 ud.set(selectedPath, forKey: "selectedPath")
                 ud.synchronize()
-                pathDes.stringValue = selectedPath.replacingOccurrences(of: "file://", with: "")
+                PathTextField.stringValue = selectedPath.replacingOccurrences(of: "file://", with: "")
             }
         }
     }
+    
     var filesDic = [String:File]() //遍历后文件集
     var parsingLog = "" //遍历后的日志
     
@@ -42,7 +44,7 @@ class ViewController: NSViewController,NSTableViewDataSource,NSTableViewDelegate
         detailTxv.textColor = NSColor.gray
         parsingIndicator.isHidden = true
         desLb.stringValue = ""
-        pathDes.stringValue = "请选择工程目录"
+//        pathDes.stringValue = "请选择工程目录"
         cleanBt.isEnabled = false
         resultTb.doubleAction = #selector(cellDoubleClick)
         if (UserDefaults().object(forKey: "selectedPath") != nil) {
@@ -55,8 +57,26 @@ class ViewController: NSViewController,NSTableViewDataSource,NSTableViewDelegate
         dragView.delegate = self
     }
     
+    // 浏览目录
+    @IBAction func browseMethodAction(_ sender: Any) {
+        let openPannel = NSOpenPanel()
+        openPannel.canChooseDirectories = true
+        openPannel.canChooseFiles = false;
+        
+        let okButtonPressed = openPannel.runModal() == NSApplication.ModalResponse.OK
+        if okButtonPressed {
+            let path = openPannel.url?.path
+            if path != nil {
+                selectedPath = path! + "/"
+            } else {
+                selectedPath = ""
+            }
+        }
+    }
+    
     //查找按钮
     @IBAction func searchMethodAction(_ sender: Any) {
+        PathTextField.stringValue = selectedPath.replacingOccurrences(of: "file://", with: "")
         if selectedPath.count > 0 {
             self.searchingUnusedMethods()
         }
@@ -87,7 +107,7 @@ class ViewController: NSViewController,NSTableViewDataSource,NSTableViewDelegate
         desLb.stringValue = "查找中..."
         cleanBt.isEnabled = false
         seachBt.isEnabled = false
-        pathDes.stringValue = selectedPath.replacingOccurrences(of: "file://", with: "")
+        PathTextField.stringValue = selectedPath.replacingOccurrences(of: "file://", with: "")
         detailTxv.string = ""
         parsingLog = ""
         DispatchQueue.global().async {
@@ -200,9 +220,9 @@ class ViewController: NSViewController,NSTableViewDataSource,NSTableViewDelegate
         //
     }
     func dragFileOk(filePath: String) {
-        print("\(filePath)")
-        selectedPath = "file://" + filePath + "/"
-        pathDes.stringValue = selectedPath.replacingOccurrences(of: "file://", with: "")
+//        print("\(filePath)")
+//        selectedPath = "file://" + filePath + "/"
+//        pathDes.stringValue = selectedPath.replacingOccurrences(of: "file://", with: "")
     }
 }
 
